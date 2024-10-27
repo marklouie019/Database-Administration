@@ -1,0 +1,123 @@
+html {
+    padding: 0;
+  }
+
+  .profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .navbar {
+    border-bottom: 1px solid #4F4E4E !important;
+    background: #262525 !important;
+    box-shadow: 0px 4px 17.6px 0px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .navbar-profile {
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-profile .username {
+    margin-left: 10px;
+    color: white;
+  }
+
+  .base {
+    display: flex;
+  }
+
+  .sideBar {
+    width: 305px;
+    height: 100vh;
+    background: #333232;
+    padding-top: 80px;
+    padding-left: 20px;
+    position: fixed;
+  }
+
+  .main-content {
+    display: flex;
+    justify-content: center;
+    padding-left: 305px;
+    padding-top: 60px;
+  }
+
+  .feed {
+    width: 645px;
+    height: auto;
+    background: transparent;
+    margin-top: 10px;
+  }
+
+  .postCard {
+    padding-top: 10px;
+    border-radius: 15px;
+    border: 1px solid #3D3B3B;
+    background: linear-gradient(94deg, #333232 0.46%, #363535 99.54%);
+    overflow: hidden;
+  }
+
+  .post-info{
+    display: flex;
+    flex-direction: row;
+  }
+
+  .post-info .user-name{
+    color: white;
+    font-weight: 500;
+  }
+  
+  .post-info .time-posted{
+    color: #d5d5d5;
+    font-weight: 300;
+    font-size: 14px;
+  }
+
+  .postCard h4 {
+    font-size: 15px;
+  }
+
+  .postTop{
+    padding-inline: 20px;
+    padding-top: 5px;
+  }
+
+  .postContent .caption{
+    padding-inline: 20px;
+    padding-bottom: 10px;
+    text-align: left;
+  }
+
+  .postContent hr{ 
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-block: 1%;
+    margin-top: 5%;
+    background-color: #000;
+  }
+
+  .interaction-bar{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding-bottom: 10px;
+  }
+
+  .react:hover, .comment:hover, .share:hover{
+    cursor: pointer;
+    background: #424040;
+
+  }
+
+  .interaction-bar img{
+    width: 25x;
+    height: 25px;
+  }
+
+  .interaction-bar span{
+    margin-left: 10px;
+  }
+
