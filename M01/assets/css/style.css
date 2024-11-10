@@ -53,7 +53,7 @@ html {
   height: 45px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(91deg, rgba(255, 214, 0, 0.50) 0.19%, rgba(255, 124, 28, 0.50) 0.2%, rgba(255, 202, 56, 0.50) 70.96%, rgba(184, 110, 0, 0.50) 116.39%);
+  background: #626161;
   color: var(--bgColor);
   font-weight: bold !important;
 }
@@ -179,8 +179,8 @@ html {
 .postContent hr {
   margin-left: 5%;
   margin-right: 5%;
-  margin-block: 1%;
-  margin-top: 5%;
+  margin-block: 0%;
+  margin-bottom: 2%;
   background-color: #000;
 }
 

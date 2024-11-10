@@ -3,7 +3,7 @@ var addLocation = document.getElementById('addLocation');
 
 // SHOW MODAL(BOOTSTRAP) TO CREATE A POST
 function selectSideNavOpt(btnID) {
-   
+
     if (btnID === 'btnCreate') {
         var modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
         modal.show();
@@ -38,5 +38,7 @@ function previewImage(event) {
         preview.src = '';
     }
 }
+
+
 
 

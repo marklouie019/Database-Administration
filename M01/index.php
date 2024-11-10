@@ -7,7 +7,7 @@ date_default_timezone_set('Asia/Manila');
 // CHECK IF FORM IS SUBMITTED
 if (isset($_POST['btnUploadPost'])) {
   $userID = 1;
-  $caption = $_POST['caption'];
+  $caption = nl2br($_POST['caption']);
   $cityName = $_POST['cityName'];
   $provinceName = $_POST['provinceName'];
   $privacy = $_POST['privacy'];
@@ -76,6 +76,7 @@ $query = "SELECT * FROM posts
   LEFT JOIN address ON posts.addressID = address.addressID
   LEFT JOIN cities ON address.cityID = cities.cityID
   LEFT JOIN provinces ON address.provinceID = provinces.provinceID
+  ORDER BY dateTime DESC
   ";
 $result = executeQuery($query);
 ?>
@@ -92,6 +93,7 @@ $result = executeQuery($query);
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </style>
 </head>
 
 <body>
@@ -150,7 +152,27 @@ $result = executeQuery($query);
                     <?php echo $postCard["firstName"] . " " . $postCard["lastName"]; ?>
                     <br>
                     <span class="time-posted">
-                      <?php echo date("F j, Y, g:i a", strtotime($postCard['dateTime'])) . " • " . ucwords($postCard['privacy']); ?>
+                      <?php
+                      // MODIFY THE TIMESTAMP INTO TIME AGO FORMAT USING DATETIME
+                      $postTime = new DateTime($postCard['dateTime']);
+                      $currentTime = new DateTime();
+                      $interval = $currentTime->diff($postTime);
+
+                      if ($interval->y > 0) {
+                        echo $interval->y . " year" . ($interval->y > 1 ? "s" : "") . " ago";
+                      } elseif ($interval->m > 0) {
+                        echo $interval->m . " month" . ($interval->m > 1 ? "s" : "") . " ago";
+                      } elseif ($interval->d > 0) {
+                        echo $interval->d . " day" . ($interval->d > 1 ? "s" : "") . " ago";
+                      } elseif ($interval->h > 0) {
+                        echo $interval->h . " hour" . ($interval->h > 1 ? "s" : "") . " ago";
+                      } elseif ($interval->i > 0) {
+                        echo $interval->i . " minute" . ($interval->i > 1 ? "s" : "") . " ago";
+                      } else {
+                        echo "Just now";
+                      }
+                      echo " • " . ucwords($postCard['privacy']);
+                      ?>
                     </span>
                   </div>
                 </div>
@@ -159,9 +181,17 @@ $result = executeQuery($query);
                 <div class="caption">
                   <?php echo $postCard['content']; ?>
                   <br>
-                  <span>📍<?php echo $postCard['cityName'] . ", " . $postCard['provinceName']; ?> </span>
+                  <?php
+                  if (!empty($postCard['cityName']) && !empty($postCard['provinceName'])) {
+                    echo '<span>📍' . htmlspecialchars($postCard['cityName']) . ', ' . htmlspecialchars($postCard['provinceName']) . '</span>';
+                  }
+                  ?>
                 </div>
-                <div class="attachment"><img src="assets/img/users/<?php echo $postCard['attachment']; ?>"></div>
+                <?php
+                if (!empty($postCard['attachment'])) {
+                  echo '<div class="attachment img-fluid"><img src="assets/img/users/' . htmlspecialchars($postCard['attachment']) . '" alt="Post Image"></div>';
+                }
+                ?>
                 <hr>
                 <div class="interaction-bar">
                   <div class="react">
@@ -207,7 +237,7 @@ $result = executeQuery($query);
             <div class="form-floating">
 
               <textarea class="form-control" placeholder="Leave a comment here" id="caption" name="caption"
-                style="height: 100px" oninput="checkForm()" required></textarea>
+                style="height: 100px" oninput="validateForm()"></textarea>
               <label for="caption">Write a status so you can Blink ;></label>
             </div>
             <div class="additionals pt-3">
@@ -266,7 +296,7 @@ $result = executeQuery($query);
               </div>
             </div>
             <button type="submit" class="btn-post w-100 text-center align-content-center" data-bs-dismiss="modal"
-              name="btnUploadPost" id="btnUploadPost">
+              name="btnUploadPost" id="btnUploadPost" disabled>
               Post</button>
           </form>
         </div>
@@ -275,6 +305,24 @@ $result = executeQuery($query);
   </div>
   </div>
   </div>
+  <script>
+    // FUNCTION TO CHECK IF POST IS EMPTY OR NOT
+    function validateForm() {
+      var caption = document.getElementById('caption').value.trim();
+      var fileInput = document.getElementById('fileInput');
+      var btnUploadPost = document.getElementById('btnUploadPost');
+
+      if (caption.length > 0 || fileInput.files.length > 0) {
+        btnUploadPost.disabled = false;
+        btnUploadPost.style.background = "linear-gradient(91deg, #FFD600 0.19%, #FF7C1C 0.2%, #FFCA38 70.96%, #B86E00 116.39%)";
+      } else {
+        btnUploadPost.disabled = true;
+        btnUploadPost.style.background = "#626161";
+      }
+    }
+
+    document.getElementById('fileInput').addEventListener('change', validateForm);
+  </script>
   <script src="assets/js/script.js"></script>
   <script src="https://kit.fontawesome.com/49a3347974.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
