@@ -1,6 +1,76 @@
 <?php
 include("connect.php");
 
+// SET TIMEZONE FOR ACCURATE TIMESTAMP
+date_default_timezone_set('Asia/Manila');
+
+// CHECK IF FORM IS SUBMITTED
+if (isset($_POST['btnUploadPost'])) {
+  $userID = 1;
+  $caption = $_POST['caption'];
+  $cityName = $_POST['cityName'];
+  $provinceName = $_POST['provinceName'];
+  $privacy = $_POST['privacy'];
+  $timeStamp = date('Y-m-d H:i:s');
+
+  // PROCESS FILE UPLOAD IF FILE IS PRESENT
+  // CHECK FILE > RETRIEVE TEMPORARY FILE PATH > MOVE FILE
+  $attachmentName = '';
+  if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+    $attachmentTmpPath = $_FILES['attachment']['tmp_name'];
+    $attachmentName = basename($_FILES['attachment']['name']);
+    $uploadDir = 'assets/img/users/';
+    $uploadFilePath = $uploadDir . $attachmentName;
+    move_uploaded_file($attachmentTmpPath, $uploadFilePath);
+  }
+
+  // CHECK OR INSERT CITY & PROVINCE
+  $cityQuery = "SELECT cityID FROM cities WHERE cityName = '$cityName'";
+  $cityResult = executeQuery($cityQuery);
+
+  if (mysqli_num_rows($cityResult) > 0) {
+    $city = mysqli_fetch_assoc($cityResult);
+    $cityID = $city['cityID'];
+  } else {
+    $insertCityQuery = "INSERT INTO cities(cityName) VALUES ('$cityName')";
+    executeQuery($insertCityQuery);
+    $cityID = mysqli_insert_id($conn);
+  }
+
+  $provinceQuery = "SELECT provinceID FROM provinces WHERE provinceName = '$provinceName'";
+  $provinceResult = executeQuery($provinceQuery);
+
+  if (mysqli_num_rows($provinceResult) > 0) {
+    $province = mysqli_fetch_assoc($provinceResult);
+    $provinceID = $province['provinceID'];
+  } else {
+    $insertprovinceQuery = "INSERT INTO provinces(provinceName) VALUES ('$provinceName')";
+    executeQuery($insertprovinceQuery);
+    $provinceID = mysqli_insert_id($conn);
+  }
+
+  // INSERT OR GET ADDRESS ID
+  $addressQuery = "SELECT addressID FROM address WHERE cityID = '$cityID' AND provinceID = '$provinceID'";
+  $addressResult = executeQuery($addressQuery);
+
+  if (mysqli_num_rows($addressResult) > 0) {
+    $addressRow = mysqli_fetch_assoc($addressResult);
+    $addressID = $addressRow['addressID'];
+  } else {
+    $addressInsertQuery = "INSERT INTO address (cityID, provinceID) VALUES ('$cityID', '$provinceID')";
+    executeQuery($addressInsertQuery);
+    $addressID = mysqli_insert_id($conn);
+  }
+
+  // INSERT THE POST INTO THE DATABASE
+  $postQuery = "INSERT INTO posts(content, attachment, privacy, dateTime, addressID, userID) 
+                VALUES ('$caption', '$attachmentName', '$privacy', '$timeStamp', '$addressID', '$userID')";
+  executeQuery($postQuery);
+
+  header("Location: index.php");
+}
+
+// FETCH POSTS FROM THE DATABASE
 $query = "SELECT * FROM posts 
   LEFT JOIN userInfo ON posts.userID = userInfo.userID 
   LEFT JOIN address ON posts.addressID = address.addressID
@@ -8,7 +78,6 @@ $query = "SELECT * FROM posts
   LEFT JOIN provinces ON address.provinceID = provinces.provinceID
   ";
 $result = executeQuery($query);
-
 ?>
 
 <!doctype html>
@@ -130,15 +199,16 @@ $result = executeQuery($query);
         </div>
         <div class="modal-body">
           <!-- CONTENT -->
-          <form action="/upload" method="post" enctype="multipart/form-data">
+          <form action="" method="post" enctype="multipart/form-data">
             <div class="profile pb-3">
               <img src="assets/img/users/louie.jpeg" alt="Profile" class="profile-pic">
               <span class="username mx-3">Mark Louie Villanueva</span>
             </div>
             <div class="form-floating">
-              <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"
-                style="height: 100px"></textarea>
-              <label for="floatingTextarea2">Write a status so you can Blink ;></label>
+
+              <textarea class="form-control" placeholder="Leave a comment here" id="caption" name="caption"
+                style="height: 100px" oninput="checkForm()" required></textarea>
+              <label for="caption">Write a status so you can Blink ;></label>
             </div>
             <div class="additionals pt-3">
               <div class="form-group">
@@ -147,7 +217,7 @@ $result = executeQuery($query);
                     <div onclick="uploadFile()" class="upload-file p-2 d-flex align-items-center gap-2 mb-3"
                       id="uploadFile">
                       <i class="fa-regular fa-image"></i>Add pictures
-                      <input type="file" id="fileInput" hidden onchange="previewImage(event)">
+                      <input type="file" id="fileInput" hidden onchange="previewImage(event)" name="attachment">
                     </div>
                   </div>
                   <div class="col-lg-6">
@@ -158,7 +228,7 @@ $result = executeQuery($query);
                 </div>
                 <!-- IMAGE PREVIEW -->
                 <div class="row">
-                  <div class="col">
+                  <div class="col mb-3">
                     <img id="imagePreview" src="" alt="Image Preview">
                   </div>
                 </div>
@@ -173,22 +243,32 @@ $result = executeQuery($query);
                       <div class="row">
                         <div class="col-lg-6">
                           <input type="text" id="cityName" class="form-control info-input info-input mb-2"
-                            placeholder="City">
+                            placeholder="City" name="cityName">
                         </div>
                         <div class="col-lg-6">
                           <input type="text" id="provinceName" class="form-control info-input info-input mb-2"
-                            placeholder="Province">
+                            placeholder="Province" name="provinceName">
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+                <div class="row">
+                  <div class="col">
+                    <div class="set-privacy">
+                      <select class="form-select mb-3" aria-label="Default select example" name="privacy">
+                        <option selected value="Public"><i class="fa-solid fa-globe"></i>Public</option>
+                        <option value="Friends"><i class="fa-solid fa-user-group"></i>Friends</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+            <button type="submit" class="btn-post w-100 text-center align-content-center" data-bs-dismiss="modal"
+              name="btnUploadPost" id="btnUploadPost">
+              Post</button>
           </form>
-        </div>
-        <div class="modal-footer">
-          <div class="btn-post w-100 text-center align-content-center" data-bs-dismiss="modal">Post</div>
         </div>
       </div>
     </div>

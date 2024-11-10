@@ -51,15 +51,15 @@ html {
 .btn-post {
   width: auto !important;
   height: 45px;
+  border: none;
   border-radius: 8px;
-  background: linear-gradient(91deg, #FFD600 0.2%, #FF7C1C 0.2%, #FFCA38 70.96%, #B86E00 116.39%);
+  background: linear-gradient(91deg, rgba(255, 214, 0, 0.50) 0.19%, rgba(255, 124, 28, 0.50) 0.2%, rgba(255, 202, 56, 0.50) 70.96%, rgba(184, 110, 0, 0.50) 116.39%);
   color: var(--bgColor);
   font-weight: bold !important;
 }
 
 .btn-post:hover {
   cursor: pointer;
-
 }
 
 .upload-file:hover {
@@ -67,11 +67,15 @@ html {
   background: var(--gray);
 }
 
+.attachment{
+  object-fit: contain;
+}
+
 #imagePreview {
   display: none;
   max-width: 100%;
-  height: auto;
-  max-height: 330px;
+  height: 100%;
+  max-height: 100px;
   object-fit: contain;
   border-radius: 5px;
 }
