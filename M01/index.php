@@ -93,7 +93,6 @@ $result = executeQuery($query);
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  </style>
 </head>
 
 <body>
@@ -135,91 +134,89 @@ $result = executeQuery($query);
       </div>
     </div>
   </div>
-  <div class="contaier">
-    <div class="main-content">
-      <div class="feed">
-        <!-- PHP BLOCK -->
-        <?php
-        if (mysqli_num_rows($result)) {
-          while ($postCard = mysqli_fetch_assoc($result)) {
-            ?>
-            <!-- POST CARDS -->
-            <div class="postCard my-3">
-              <div class="postTop">
-                <div class="post-info">
-                  <img src="assets/img/users/<?php echo $postCard['profilePic']; ?>" alt="Profile" class="profile-pic me-3">
-                  <div class="user-name">
-                    <?php echo $postCard["firstName"] . " " . $postCard["lastName"]; ?>
-                    <br>
-                    <span class="time-posted">
-                      <?php
-                      // MODIFY THE TIMESTAMP INTO TIME AGO FORMAT USING DATETIME
-                      $postTime = new DateTime($postCard['dateTime']);
-                      $currentTime = new DateTime();
-                      $interval = $currentTime->diff($postTime);
-
-                      if ($interval->y > 0) {
-                        echo $interval->y . " year" . ($interval->y > 1 ? "s" : "") . " ago";
-                      } elseif ($interval->m > 0) {
-                        echo $interval->m . " month" . ($interval->m > 1 ? "s" : "") . " ago";
-                      } elseif ($interval->d > 0) {
-                        echo $interval->d . " day" . ($interval->d > 1 ? "s" : "") . " ago";
-                      } elseif ($interval->h > 0) {
-                        echo $interval->h . " hour" . ($interval->h > 1 ? "s" : "") . " ago";
-                      } elseif ($interval->i > 0) {
-                        echo $interval->i . " minute" . ($interval->i > 1 ? "s" : "") . " ago";
-                      } else {
-                        echo "Just now";
-                      }
-                      echo " • " . ucwords($postCard['privacy']);
-                      ?>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="postContent">
-                <div class="caption">
-                  <?php echo $postCard['content']; ?>
+  <div class="main-content">
+    <div class="feed px-4">
+      <!-- PHP BLOCK -->
+      <?php
+      if (mysqli_num_rows($result)) {
+        while ($postCard = mysqli_fetch_assoc($result)) {
+          ?>
+          <!-- POST CARDS -->
+          <div class="postCard my-3">
+            <div class="postTop">
+              <div class="post-info">
+                <img src="assets/img/users/<?php echo $postCard['profilePic']; ?>" alt="Profile" class="profile-pic me-3">
+                <div class="user-name">
+                  <?php echo $postCard["firstName"] . " " . $postCard["lastName"]; ?>
                   <br>
-                  <?php
-                  if (!empty($postCard['cityName']) && !empty($postCard['provinceName'])) {
-                    echo '<span>📍' . htmlspecialchars($postCard['cityName']) . ', ' . htmlspecialchars($postCard['provinceName']) . '</span>';
-                  }
-                  ?>
-                </div>
-                <?php
-                if (!empty($postCard['attachment'])) {
-                  echo '<div class="attachment img-fluid"><img src="assets/img/users/' . htmlspecialchars($postCard['attachment']) . '" alt="Post Image"></div>';
-                }
-                ?>
-                <hr>
-                <div class="interaction-bar">
-                  <div class="react">
-                    <a onclick="reactToPost()"><img src="assets/img/ui/heart.svg" alt="react button"><span
-                        class="like">Like</span></a>
-                  </div>
-                  <div class="comment">
-                    <a><img src="assets/img/ui/comment.svg" alt="comment button"><span class="comment">Comment</span></a>
-                  </div>
-                  <div class="share">
-                    <a id="btnShare" onclick=""><img src="assets/img/ui/share.svg" alt="share button"><span
-                        class="share">Share</span></a>
-                  </div>
+                  <span class="time-posted">
+                    <?php
+                    // MODIFY THE TIMESTAMP INTO TIME AGO FORMAT USING DATETIME
+                    $postTime = new DateTime($postCard['dateTime']);
+                    $currentTime = new DateTime();
+                    $interval = $currentTime->diff($postTime);
+
+                    if ($interval->y > 0) {
+                      echo $interval->y . " year" . ($interval->y > 1 ? "s" : "") . " ago";
+                    } elseif ($interval->m > 0) {
+                      echo $interval->m . " month" . ($interval->m > 1 ? "s" : "") . " ago";
+                    } elseif ($interval->d > 0) {
+                      echo $interval->d . " day" . ($interval->d > 1 ? "s" : "") . " ago";
+                    } elseif ($interval->h > 0) {
+                      echo $interval->h . " hour" . ($interval->h > 1 ? "s" : "") . " ago";
+                    } elseif ($interval->i > 0) {
+                      echo $interval->i . " minute" . ($interval->i > 1 ? "s" : "") . " ago";
+                    } else {
+                      echo "Just now";
+                    }
+                    echo " • " . ucwords($postCard['privacy']);
+                    ?>
+                  </span>
                 </div>
               </div>
             </div>
-            <?php
-          }
-        } else {
-          echo "<p>Oops, there are no posts to display </p>";
+            <div class="postContent">
+              <div class="caption">
+                <?php echo $postCard['content']; ?>
+                <br>
+                <?php
+                if (!empty($postCard['cityName']) && !empty($postCard['provinceName'])) {
+                  echo '<span>📍' . htmlspecialchars($postCard['cityName']) . ', ' . htmlspecialchars($postCard['provinceName']) . '</span>';
+                }
+                ?>
+              </div>
+              <?php
+              if (!empty($postCard['attachment'])) {
+                echo '<div class="attachment img-fluid"><img src="assets/img/users/' . htmlspecialchars($postCard['attachment']) . '" alt="Post Image"></div>';
+              }
+              ?>
+              <hr>
+              <div class="interaction-bar">
+                <div class="react">
+                  <a onclick="reactToPost()"><img src="assets/img/ui/heart.svg" alt="react button"><span
+                      class="like">Like</span></a>
+                </div>
+                <div class="comment">
+                  <a><img src="assets/img/ui/comment.svg" alt="comment button"><span class="comment">Comment</span></a>
+                </div>
+                <div class="share">
+                  <a id="btnShare" onclick=""><img src="assets/img/ui/share.svg" alt="share button"><span
+                      class="share">Share</span></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <?php
         }
-        ?>
-        <!-- END PHP BLOCK -->
-      </div>
+      } else {
+        echo "<p>Oops, there are no posts to display </p>";
+      }
+      ?>
+      <!-- END PHP BLOCK -->
     </div>
   </div>
   <!-- CREATE POST MODAL -->
-  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+  <div class="modal fade p-0" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
     aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.5);" data-bs-theme="dark">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
@@ -258,7 +255,7 @@ $result = executeQuery($query);
                 </div>
                 <!-- IMAGE PREVIEW -->
                 <div class="row">
-                  <div class="col mb-3">
+                  <div class="col my-sm-3 mb-lg-3">
                     <img id="imagePreview" src="" alt="Image Preview">
                   </div>
                 </div>
@@ -287,8 +284,10 @@ $result = executeQuery($query);
                   <div class="col">
                     <div class="set-privacy">
                       <select class="form-select mb-3" aria-label="Default select example" name="privacy">
-                        <option selected value="Public"><i class="fa-solid fa-globe"></i>Public</option>
-                        <option value="Friends"><i class="fa-solid fa-user-group"></i>Friends</option>
+                        <option selected value="Public"><i class="fa-solid fa-globe"></i>Public
+                        </option>
+                        <option value="Friends"><i class="fa-solid fa-user-group"></i>Friends
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -314,7 +313,8 @@ $result = executeQuery($query);
 
       if (caption.length > 0 || fileInput.files.length > 0) {
         btnUploadPost.disabled = false;
-        btnUploadPost.style.background = "linear-gradient(91deg, #FFD600 0.19%, #FF7C1C 0.2%, #FFCA38 70.96%, #B86E00 116.39%)";
+        btnUploadPost.style.background =
+          "linear-gradient(91deg, #FFD600 0.19%, #FF7C1C 0.2%, #FFCA38 70.96%, #B86E00 116.39%)";
       } else {
         btnUploadPost.disabled = true;
         btnUploadPost.style.background = "#626161";
@@ -326,8 +326,8 @@ $result = executeQuery($query);
   <script src="assets/js/script.js"></script>
   <script src="https://kit.fontawesome.com/49a3347974.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script>
 </body>
 
 </html>

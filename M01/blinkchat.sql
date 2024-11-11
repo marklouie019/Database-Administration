@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 10, 2024 at 04:39 PM
+-- Generation Time: Nov 11, 2024 at 08:01 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -217,7 +217,8 @@ INSERT INTO `posts` (`postID`, `userID`, `content`, `dateTime`, `privacy`, `isDe
 (4, 1, 'Chilling in the summer🐚', '2024-03-03 11:30:00.000000', 'friends', 0, 'siargao.jpg', 7),
 (60, 1, 'Do Not Go Gentle into That Good Night<br />\r\nBy Dylan Thomas<br />\r\n<br />\r\nDo not go gentle into that good night,<br />\r\nOld age should burn and rave at close of day;<br />\r\nRage, rage against the dying of the light.<br />\r\n<br />\r\nThough wise men at their end know dark is right,<br />\r\nBecause their words had forked no lightning they<br />\r\nDo not go gentle into that good night.<br />\r\n<br />\r\nGood men, the last wave by, crying how bright<br />\r\nTheir frail deeds might have danced in a green bay,<br />\r\nRage, rage against the dying of the light.<br />\r\n<br />\r\nWild men who caught and sang the sun in flight,<br />\r\nAnd learn, too late, they grieved it on its way,<br />\r\nDo not go gentle into that good night.<br />\r\n<br />\r\nGrave men, near death, who see with blinding sight<br />\r\nBlind eyes could blaze like meteors and be gay,   <br />\r\nRage, rage against the dying of the light.<br />\r\n<br />\r\nAnd you, my father, there on the sad height,<br />\r\nCurse, bless, me now with your fierce tears, I pray.<br />\r\nDo not go gentle into that good night.<br />\r\nRage, rage against the dying of the light.', '2024-11-10 23:14:49.000000', 'Public', 0, '', 12),
 (61, 1, 'The passive feeling...', '2024-11-10 23:24:39.000000', 'Friends', 0, 'crying-sticker.png', 12),
-(62, 1, '', '2024-11-10 23:27:24.000000', 'Friends', 0, 'paris.jpg', 12);
+(62, 1, '', '2024-11-10 23:27:24.000000', 'Friends', 0, 'paris.jpg', 12),
+(63, 1, 'Venom (2018)✨<br />\r\nEdited using Adobe Photoshop 2023', '2024-11-11 13:59:57.000000', 'Friends', 0, 'villanueva_poster.jpg', 12);
 
 -- --------------------------------------------------------
 
@@ -461,7 +462,7 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `postID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `postID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `provinces`

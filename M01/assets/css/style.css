@@ -1,8 +1,3 @@
-html {
-  padding: 0;
-  background: var(--bgColor);
-}
-
 :root {
   /* COLOR THEME */
   --bgColor: #262525;
@@ -11,7 +6,18 @@ html {
   --yellow: #FFD600;
 }
 
-.main-content {
+html {
+  padding: 0;
+  background: var(--bgColor);
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body{
   background: var(--bgColor);
 }
 
@@ -36,6 +42,7 @@ html {
 .navbar-profile .username {
   margin-left: 10px;
   color: var(--white);
+  display: block;
 }
 
 .modal {
@@ -50,12 +57,13 @@ html {
 
 .btn-post {
   width: auto !important;
-  height: 45px;
+  height: 100%;
   border: none;
   border-radius: 8px;
   background: #626161;
   color: var(--bgColor);
   font-weight: bold !important;
+  padding-block: 2%;
 }
 
 .btn-post:hover {
@@ -67,7 +75,10 @@ html {
   background: var(--gray);
 }
 
-.attachment{
+.attachment img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
   object-fit: contain;
 }
 
@@ -90,7 +101,7 @@ html {
 }
 
 .sideBar {
-  width: 215px;
+  width: 250px;
   height: 100vh;
   background: var(--bgColor);
   padding-top: 80px;
@@ -98,21 +109,28 @@ html {
   position: fixed;
   font-size: 24px;
   color: var(--white);
+  z-index: 10;
 }
 
 .sidebar {
   padding: 10px;
   border-radius: 8px;
+  z-index: 10;
 }
 
 .sidebar span {
   font-size: 15px;
 }
 
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+}
+
 .home,
 .messages,
 .create {
-  width: 200px;
+  width: auto;
 }
 
 .home:hover,
@@ -125,15 +143,17 @@ html {
 .main-content {
   display: flex;
   justify-content: center;
-  padding-left: 305px;
   padding-top: 60px;
+  background: var(--bgColor);
+
 }
 
 .feed {
   width: 645px;
   height: auto;
-  background: transparent;
   margin-top: 10px;
+  margin-left: 250px;
+  background: var(--bgColor);
 }
 
 .postCard {
@@ -206,4 +226,31 @@ html {
 
 .interaction-bar span {
   margin-left: 10px;
+}
+
+@media (max-width: 768px) {
+
+  .nav-item .username {
+    display: none;
+  }
+
+  .sideBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: space-around;
+    background: #262525;
+    padding: 10px 0;
+  }
+
+  .main-content {
+    padding-bottom: 60px;
+  }
+
+  .feed {
+    margin-left: 0;
+  }
 }
