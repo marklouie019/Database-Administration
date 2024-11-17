@@ -85,7 +85,6 @@ if (isset($_POST['btnDeletePost'])) {
   $postID = $_POST['postID'];
   $deleteQuery = "DELETE FROM posts WHERE postID = '$postID'";
   executeQuery($deleteQuery);
-  echo "Delete request received for postID: " . $_POST['postID'];
   header("Location: index.php");
 }
 
