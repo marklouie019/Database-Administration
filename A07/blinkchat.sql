@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 17, 2024 at 03:23 PM
+-- Generation Time: Nov 24, 2024 at 04:41 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -47,7 +47,13 @@ INSERT INTO `address` (`addressID`, `cityID`, `provinceID`) VALUES
 (7, 7, 6),
 (8, 8, 7),
 (11, 11, 10),
-(12, 12, 11);
+(12, 12, 11),
+(13, 12, 11),
+(14, 12, 11),
+(15, 12, 11),
+(16, 1, 1),
+(17, 13, 1),
+(18, 14, 1);
 
 -- --------------------------------------------------------
 
@@ -73,7 +79,9 @@ INSERT INTO `cities` (`cityID`, `cityName`) VALUES
 (6, 'Davao City'),
 (7, 'Siargao'),
 (11, 'Tagaytay City'),
-(12, '');
+(12, ''),
+(13, 'Sto.Tomas'),
+(14, 'Tanauan');
 
 -- --------------------------------------------------------
 
@@ -215,9 +223,11 @@ INSERT INTO `posts` (`postID`, `userID`, `content`, `dateTime`, `privacy`, `isDe
 (2, 2, 'Had a great time at Cebu IT Park with friends.', '2024-10-26 09:15:00.000000', 'public', 0, 'cebu-it-park.jpg', 5),
 (3, 3, 'Exploring the mountains of Davao!', '2024-10-26 12:30:00.000000', 'friends', 0, 'davao.jpg', 6),
 (4, 1, 'Chilling in the summer🐚', '2024-03-03 11:30:00.000000', 'friends', 0, 'siargao.jpg', 7),
-(60, 1, 'Do Not Go Gentle into That Good Night<br />\r\nBy Dylan Thomas<br />\r\n<br />\r\nDo not go gentle into that good night,<br />\r\nOld age should burn and rave at close of day;<br />\r\nRage, rage against the dying of the light.<br />\r\n<br />\r\nThough wise men at their end know dark is right,<br />\r\nBecause their words had forked no lightning they<br />\r\nDo not go gentle into that good night.<br />\r\n<br />\r\nGood men, the last wave by, crying how bright<br />\r\nTheir frail deeds might have danced in a green bay,<br />\r\nRage, rage against the dying of the light.<br />\r\n<br />\r\nWild men who caught and sang the sun in flight,<br />\r\nAnd learn, too late, they grieved it on its way,<br />\r\nDo not go gentle into that good night.<br />\r\n<br />\r\nGrave men, near death, who see with blinding sight<br />\r\nBlind eyes could blaze like meteors and be gay,   <br />\r\nRage, rage against the dying of the light.<br />\r\n<br />\r\nAnd you, my father, there on the sad height,<br />\r\nCurse, bless, me now with your fierce tears, I pray.<br />\r\nDo not go gentle into that good night.<br />\r\nRage, rage against the dying of the light.', '2024-11-10 23:14:49.000000', 'Public', 0, '', 12),
-(61, 1, 'The passive feeling...', '2024-11-10 23:24:39.000000', 'Friends', 0, 'crying-sticker.png', 12),
-(62, 1, '', '2024-11-10 23:27:24.000000', 'Friends', 0, 'paris.jpg', 12);
+(62, 1, '', '2024-11-10 23:27:24.000000', 'Friends', 0, 'paris.jpg', 12),
+(104, 1, 'Maki: Vector Art', '2024-11-24 22:58:54.000000', 'Friends', 0, 'Villanueva_vectorposter.png', 18),
+(113, 1, 'Venom (2018)(Multimedia)', '2024-11-24 22:36:23.000000', 'Friends', 0, 'villanueva_poster.jpg', 12),
+(114, 1, 'Zoro Fanart (Art Appreciation)', '2024-11-24 22:32:01.000000', 'Public', 0, 'zoro-painting.jpg', 17),
+(115, 1, 'Check out my portfolio: https://marklouie019.github.io/', '2024-11-24 22:56:33.000000', 'Public', 0, 'web-portfolio.png', 12);
 
 -- --------------------------------------------------------
 
@@ -413,13 +423,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `address`
 --
 ALTER TABLE `address`
-  MODIFY `addressID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `addressID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `cities`
 --
 ALTER TABLE `cities`
-  MODIFY `cityID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `cityID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `closefriends`
@@ -461,7 +471,7 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `postID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `postID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
 
 --
 -- AUTO_INCREMENT for table `provinces`

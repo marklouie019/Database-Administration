@@ -10,6 +10,14 @@ function selectSideNavOpt(btnID) {
     }
 }
 
+// SHOW OPTIONS MODAL
+function showOptions(btnID, ID) {
+    if (btnID === `btnOptions${ID}`) {
+        var modal = new bootstrap.Modal(document.getElementById(`optionsModal${ID}`));
+        modal.show();
+    }
+}
+
 // SHOW MODAL(BOOTSTRAP) TO CONFIRM POST DELETION
 function confirmDeletion(btnID, ID) {
 
@@ -19,7 +27,33 @@ function confirmDeletion(btnID, ID) {
     }
 }
 
+// PASS THE VALUE IN THE EDIT MODAL
+function editPost(
+    postID,
+    profilePic, postContent, attachment,
+    province, city) {
+
+    var editShowDP = document.getElementById(`editShowDP${postID}`);
+    var editContent = document.getElementById(`editContent${postID}`);
+    var previewAttachment = document.getElementById(`imagePreview${postID}`)
+    var provinceName = document.getElementById(`provinceName${postID}`);
+    var cityName = document.getElementById(`cityName${postID}`);
+
+    editShowDP.src = 'assets/img/users/' + profilePic;
+    editContent.value = postContent;
+    if (previewAttachment != "") {
+        previewAttachment.src = 'assets/img/users/' + attachment;
+    }
+    provinceName.value = province;
+    cityName.value = city;
+}
+
 // CLICKS THE FILE INPUT ELEMENT
+function uploadFile2(fileInputId) {
+    const fileInput = document.getElementById(fileInputId);
+    fileInput.click();
+}
+
 function uploadFile() {
     fileInput.click();
 }
@@ -31,6 +65,16 @@ function inputLocation() {
 
 // FUNCTION TO PREVIEW THE IMAGE UPLOADED BY THE USER
 // CHECK FILE > LOAD FILE > READ FILE
+function previewImage2(event, previewID) {
+    const reader = new FileReader();
+    reader.onload = function () {
+        const previewElement = document.getElementById(previewID);
+        previewElement.src = reader.result;
+        previewElement.style.display = 'block';
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
 function previewImage(event) {
     const file = event.target.files[0];
     const preview = document.getElementById('imagePreview');
@@ -52,15 +96,14 @@ function previewImage(event) {
 function validateForm() {
     var caption = document.getElementById('caption').value.trim();
     var fileInput = document.getElementById('fileInput');
-    var btnUploadPost = document.getElementById('btnUploadPost');
+    var button = document.getElementById('btnUploadPost');
 
     if (caption.length > 0 || fileInput.files.length > 0) {
-        btnUploadPost.disabled = false;
-        btnUploadPost.style.background =
-            "linear-gradient(91deg, #FFD600 0.19%, #FF7C1C 0.2%, #FFCA38 70.96%, #B86E00 116.39%)";
+        button.disabled = false;
+        button.style.background = "linear-gradient(91deg, #FFD600 0.19%, #FF7C1C 0.2%, #FFCA38 70.96%, #B86E00 116.39%)";
     } else {
-        btnUploadPost.disabled = true;
-        btnUploadPost.style.background = "#626161";
+        button.disabled = true;
+        button.style.background = "#626161";
     }
 }
 

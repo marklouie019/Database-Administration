@@ -4,89 +4,17 @@ include("connect.php");
 // SET TIMEZONE FOR ACCURATE TIMESTAMP
 date_default_timezone_set('Asia/Manila');
 
-// CHECK IF FORM IS SUBMITTED
-if (isset($_POST['btnUploadPost'])) {
-  $userID = 1;
-  $caption = nl2br($_POST['caption']);
-  $cityName = $_POST['cityName'];
-  $provinceName = $_POST['provinceName'];
-  $privacy = $_POST['privacy'];
-  $timeStamp = date('Y-m-d H:i:s');
-
-  // PROCESS FILE UPLOAD IF FILE IS PRESENT
-  // CHECK FILE > RETRIEVE TEMPORARY FILE PATH > MOVE FILE
-  $attachmentName = '';
-  if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
-    $attachmentTmpPath = $_FILES['attachment']['tmp_name'];
-    $attachmentName = basename($_FILES['attachment']['name']);
-    $uploadDir = 'assets/img/users/';
-    $uploadFilePath = $uploadDir . $attachmentName;
-    move_uploaded_file($attachmentTmpPath, $uploadFilePath);
-  }
-
-  // CHECK OR INSERT CITY & PROVINCE
-  $cityQuery = "SELECT cityID FROM cities WHERE cityName = '$cityName'";
-  $cityResult = executeQuery($cityQuery);
-
-  if (mysqli_num_rows($cityResult) > 0) {
-    $city = mysqli_fetch_assoc($cityResult);
-    $cityID = $city['cityID'];
-  } else {
-    $insertCityQuery = "INSERT INTO cities(cityName) VALUES ('$cityName')";
-    executeQuery($insertCityQuery);
-    $cityID = mysqli_insert_id($conn);
-  }
-
-  $provinceQuery = "SELECT provinceID FROM provinces WHERE provinceName = '$provinceName'";
-  $provinceResult = executeQuery($provinceQuery);
-
-  if (mysqli_num_rows($provinceResult) > 0) {
-    $province = mysqli_fetch_assoc($provinceResult);
-    $provinceID = $province['provinceID'];
-  } else {
-    $insertprovinceQuery = "INSERT INTO provinces(provinceName) VALUES ('$provinceName')";
-    executeQuery($insertprovinceQuery);
-    $provinceID = mysqli_insert_id($conn);
-  }
-
-  // INSERT OR GET ADDRESS ID
-  $addressQuery = "SELECT addressID FROM address WHERE cityID = '$cityID' AND provinceID = '$provinceID'";
-  $addressResult = executeQuery($addressQuery);
-
-  if (mysqli_num_rows($addressResult) > 0) {
-    $addressRow = mysqli_fetch_assoc($addressResult);
-    $addressID = $addressRow['addressID'];
-  } else {
-    $addressInsertQuery = "INSERT INTO address (cityID, provinceID) VALUES ('$cityID', '$provinceID')";
-    executeQuery($addressInsertQuery);
-    $addressID = mysqli_insert_id($conn);
-  }
-
-  // INSERT THE POST INTO THE DATABASE
-  $postQuery = "INSERT INTO posts(content, attachment, privacy, dateTime, addressID, userID) 
-                VALUES ('$caption', '$attachmentName', '$privacy', '$timeStamp', '$addressID', '$userID')";
-  executeQuery($postQuery);
-
-  header("Location: index.php");
-}
+// INSERT DATA
+include("shared/index/insert.php");
 
 // FETCH POSTS FROM THE DATABASE
-$query = "SELECT * FROM posts 
-  LEFT JOIN userInfo ON posts.userID = userInfo.userID 
-  LEFT JOIN address ON posts.addressID = address.addressID
-  LEFT JOIN cities ON address.cityID = cities.cityID
-  LEFT JOIN provinces ON address.provinceID = provinces.provinceID
-  ORDER BY dateTime DESC
-  ";
-$result = executeQuery($query);
+include("shared/index/read.php");
 
 // DELETE A POST FROM THE DATABASE
-if (isset($_POST['btnDeletePost'])) {
-  $postID = $_POST['postID'];
-  $deleteQuery = "DELETE FROM posts WHERE postID = '$postID'";
-  executeQuery($deleteQuery);
-  header("Location: index.php");
-}
+include("shared/index/delete.php");
+
+// EDIT POST FROM THE DATABASE
+include("shared/index/update.php");
 
 ?>
 
@@ -102,53 +30,10 @@ if (isset($_POST['btnDeletePost'])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <style>
-    html {
-      scroll-behavior: smooth;
-    }
-  </style>
-
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg fixed-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="index.php"><img src="assets/img/ui/blinkchat-logo.svg" alt="blinkchat logo"></a>
-      <li class="nav-item navbar-profile ml-auto">
-        <img src="assets/img/users/louie.jpeg" alt="Profile" class="profile-pic">
-        <span class="username mx-3">Mark Louie Villanueva</span>
-      </li>
-    </div>
-  </nav>
-  <div class="sideBar">
-    <div class="row">
-      <div class="col p-0">
-        <a onclick="selectSideNavOpt('btnHome')" id="btnHome">
-          <div class="sidebar home mb-2 d-flex align-items-center gap-2" id="btnHome">
-            <i class="fa-solid fa-house"></i><span> Home</span>
-          </div>
-        </a>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col p-0">
-        <a onclick="selectSideNavOpt('btnMessages')" id="btnMessages">
-          <div class="sidebar messages mb-2 d-flex align-items-center gap-2">
-            <i class="fa-regular fa-comment"></i><span> Messages</span>
-          </div>
-        </a>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col p-0">
-        <a onclick="selectSideNavOpt('btnCreate')" id="btnCreate">
-          <div class="sidebar create mb-2 d-flex align-items-center gap-2">
-            <i class="fa-regular fa-square-plus"></i></i><span> Create</span>
-          </div>
-        </a>
-      </div>
-    </div>
-  </div>
+  <?php include("shared/index/navbar.php"); ?>
   <div class="main-content">
     <div class="feed px-4">
       <!-- PHP BLOCK -->
@@ -164,60 +49,23 @@ if (isset($_POST['btnDeletePost'])) {
                 <div class="user-name">
                   <?php echo $postCard["firstName"] . " " . $postCard["lastName"]; ?>
                   <br>
-                  <span class="time-posted">
-                    <?php
-                    // MODIFY THE TIMESTAMP INTO TIME AGO FORMAT USING DATETIME
-                    $postTime = new DateTime($postCard['dateTime']);
-                    $currentTime = new DateTime();
-                    $interval = $currentTime->diff($postTime);
-
-                    if ($interval->y > 0) {
-                      echo $interval->y . " year" . ($interval->y > 1 ? "s" : "") . " ago";
-                    } elseif ($interval->m > 0) {
-                      echo $interval->m . " month" . ($interval->m > 1 ? "s" : "") . " ago";
-                    } elseif ($interval->d > 0) {
-                      echo $interval->d . " day" . ($interval->d > 1 ? "s" : "") . " ago";
-                    } elseif ($interval->h > 0) {
-                      echo $interval->h . " hour" . ($interval->h > 1 ? "s" : "") . " ago";
-                    } elseif ($interval->i > 0) {
-                      echo $interval->i . " minute" . ($interval->i > 1 ? "s" : "") . " ago";
-                    } else {
-                      echo "Just now";
-                    }
-                    echo " • " . ucwords($postCard['privacy']);
-                    ?>
-                  </span>
+                  <!-- TIME AGO FUNCTION-->
+                  <?php include("shared/index/time-ago.php"); ?>
                 </div>
                 <!-- DELETE CONFIRMATION MODAL -->
-                <div class="modal fade p-0" id="deleteModal<?php echo $postCard['postID'] ?>" tabindex="-1" aria-labelledby="deleteModalLabel"
-                  aria-hidden="true" data-bs-theme="dark" style="background-color: rgba(0, 0, 0, 0.5);">
-                  <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel"><i class="fa-solid fa-triangle-exclamation"
-                            style="color:#FFD600"></i> Confirm Deletion
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        Are you sure you want to delete this post?<br> Action cannot be undone.
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <form method="POST" action="">
-                          <input type="hidden" name="postID" value="<?php echo $postCard['postID']; ?>">
-                          <button  type="submit" name="btnDeletePost" id="confirmDelete" class="btn btn-danger"
-                            data-bs-dismiss="modal">Delete</button>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- DELETE BUTTON -->
-                <button onclick="confirmDeletion('btnDeletePost<?php echo $postCard['postID'] ?>', '<?php echo $postCard['postID'] ?>')"  type="button"
-                  class="btn-delete ms-auto" id="btnDeletePost<?php echo $postCard['postID'] ?>">
-                  <i class="fa-solid fa-ellipsis" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="Delete post" id="icon"></i>
+                <?php include("shared/modals/delete-post.php") ?>
+                <!-- OPTIONS BUTTON -->
+                <button <?php echo ($postCard['userID'] != 1) ? 'disabled' : '' ?>
+                  onclick="showOptions('btnOptions<?php echo $postCard['postID'] ?>', '<?php echo $postCard['postID'] ?>')"
+                  type="button" class="btn-delete ms-auto" id="btnOptions<?php echo $postCard['postID'] ?>"
+                  data-bs-html="true" data-bs-toggle="popover" data-bs-placement="bottom"
+                  data-bs-content="<?php echo ($postCard['userID'] != 1) ? 'You can\'t edit this post.' : 'Options' ?>">
+                  <i class=" fa-solid fa-ellipsis" id="icon"></i>
                 </button>
+                <!-- OPTIONS MODAL -->
+                <?php include('shared/modals/options-post.php') ?>
+                <!-- EDIT POST MODAL -->
+                <?php include('shared/modals/edit-post.php') ?>
               </div>
             </div>
             <div class="postContent">
@@ -250,6 +98,8 @@ if (isset($_POST['btnDeletePost'])) {
               </div>
             </div>
           </div>
+          <!-- CREATE POST MODAL -->
+          <?php include("shared/modals/create-post.php") ?>
           <?php
         }
       } else {
@@ -259,110 +109,15 @@ if (isset($_POST['btnDeletePost'])) {
       <!-- END PHP BLOCK -->
     </div>
   </div>
-  <!-- CREATE POST MODAL -->
-  <div class="container-fluid">
-    <div class="modal fade p-0" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
-      aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.5);" data-bs-theme="dark">
-      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title w-100 text-center" id="confirmationModalLabel">Create a Blink post</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <!-- CONTENT -->
-            <form action="" method="post" enctype="multipart/form-data">
-              <div class="profile pb-3">
-                <img src="assets/img/users/louie.jpeg" alt="Profile" class="profile-pic">
-                <span class="username mx-3">Mark Louie Villanueva</span>
-              </div>
-              <div class="form-floating">
-
-                <textarea class="form-control" placeholder="Leave a comment here" id="caption" name="caption"
-                  style="height: 100px" oninput="validateForm()"></textarea>
-                <label for="caption">Write a status so you can Blink ;></label>
-              </div>
-              <div class="additionals pt-3">
-                <div class="form-group">
-                  <div class="row">
-                    <div class="col-lg-6">
-                      <div onclick="uploadFile()" class="upload-file p-2 d-flex align-items-center gap-2 mb-3"
-                        id="uploadFile">
-                        <i class="fa-regular fa-image"></i>Add pictures
-                        <input type="file" id="fileInput" hidden onchange="previewImage(event)" name="attachment">
-                      </div>
-                    </div>
-                    <div class="col-lg-6">
-                      <div class="add-location p-2 d-flex align-items-center gap-2" onclick="inputLocation()">
-                        <i class="fa-solid fa-location-dot"></i>Add location
-                      </div>
-                    </div>
-                  </div>
-                  <!-- IMAGE PREVIEW -->
-                  <div class="row">
-                    <div class="col my-sm-3 mb-lg-3">
-                      <img id="imagePreview" src="" alt="Image Preview">
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col">
-                      <div class="input-location" id="addLocation">
-                        <div class="row">
-                          <div class="col my-2">
-                            Add location
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-lg-6">
-                            <input type="text" id="cityName" class="form-control info-input info-input mb-2"
-                              placeholder="City" name="cityName">
-                          </div>
-                          <div class="col-lg-6">
-                            <input type="text" id="provinceName" class="form-control info-input info-input mb-2"
-                              placeholder="Province" name="provinceName">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col">
-                      <div class="set-privacy">
-                        <select class="form-select mb-3" aria-label="Default select example" name="privacy">
-                          <option selected value="Public"><i class="fa-solid fa-globe"></i>Public
-                          </option>
-                          <option value="Friends"><i class="fa-solid fa-user-group"></i>Friends
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button type="submit" class="btn-post w-100 text-center align-content-center" data-bs-dismiss="modal"
-                name="btnUploadPost" id="btnUploadPost" disabled>
-                Post</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
     crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
   <script>
-    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-    const popoverList = [...popoverTriggerList].map(popoverTriggerEl => {
+    var popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+    var popoverList = Array.prototype.map.call(popoverTriggerList, function (popoverTriggerEl) {
       return new bootstrap.Popover(popoverTriggerEl, {
         trigger: 'hover'
       });
