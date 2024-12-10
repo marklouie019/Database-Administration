@@ -2,12 +2,31 @@
     height: 45px;
 }
 
-.page-top{
-    margin-top: 75px;
+.top{
+    padding-top: 75px;
+    padding-inline: 20px;
+    padding-bottom: 20px;
 }
 
 .filters ul{
     list-style: none;
+}
+
+.filters-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: end;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    padding: 5px;
 }
 
 .logs-table{
@@ -15,12 +34,13 @@
 }
 
 .custom-table {
-    width: 96%;
+    width: calc(100% - 40px);
     border-collapse: collapse;
     border-spacing: 0;
-    margin-left: 20px;
+    margin-inline: 20px;
     overflow-x: scroll;
     overflow-y: hidden;
+    overflow: hidden;
 }
 
 .custom-table th,
@@ -46,4 +66,21 @@
 
 .custom-table td {
     border-bottom: 1px solid #ddd;
+}
+
+.log-column, .sort{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sort{
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+}
+
+.sort:hover{
+    background: #c2c0c0;
+    cursor: pointer;
 }
