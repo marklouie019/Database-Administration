@@ -20,20 +20,45 @@ class FlightLog
     public function displayLog()
     {
         return '<tr>
-                    <td>' . $this->flightNumber . '</td>
-                    <td>' . $this->departureDateTime . '</td>
-                    <td>' . $this->arrivalDateTime . '</td>
-                    <td>' . $this->flightDurationMinutes . '</td>
+                    <td class="text-center">' . $this->flightNumber . '</td>
+                    <td class="text-center">' . $this->departureDateTime . '</td>
+                    <td class="text-center">' . $this->arrivalDateTime . '</td>
+                    <td class="text-center">' . $this->flightDurationMinutes . '</td>
                     <td>' . $this->airlineName . '</td>
                     <td>' . $this->aircraftType . '</td>
-                    <td>' . $this->passengerCount . '</td>
-                    <td>' . $this->ticketPrice . '</td>
+                    <td class="text-center">' . $this->passengerCount . '</td>
+                    <td class="text-center">' . $this->ticketPrice . '</td>
                     <td>' . $this->pilotName . '</td>
                 </tr>';
     }
     public function getAllLogs()
     {
-        $this->logsQuery = "SELECT * FROM flightlogs" . " " . $this->condition;
+        $sortColumn = isset($_GET['sortColumn']) ? $_GET['sortColumn'] : '';
+        $sortDirection = isset($_GET['sortDirection']) ? $_GET['sortDirection'] : 'ASC';
+
+        $tableColumns = array(
+            'flightNumber',
+            'departureDatetime',
+            'arrivalDatetime',
+            'flightDurationMinutes',
+            'airlineName',
+            'aircraftType',
+            'passengerCount',
+            'ticketPrice',
+            'pilotName'
+        );
+
+        $sortColumnName = isset($tableColumns[$sortColumn]) ? $tableColumns[$sortColumn] : '';
+        if (!$sortColumnName) {
+            $sortColumnName = 'flightNumber';
+        }
+
+        if ($sortDirection !== 'ASC' && $sortDirection !== 'DESC') {
+            $sortDirection = 'ASC';
+        }
+
+        $sortCondition = " ORDER BY " . $sortColumnName . " " . $sortDirection;
+        $this->logsQuery = "SELECT * FROM flightlogs" . " " . $this->condition . $sortCondition;
         $this->logsResult = executeQuery($this->logsQuery);
 
         $flightLogs = array();
@@ -53,54 +78,54 @@ class FlightLog
 
         return $flightLogs;
     }
-    public function loadFilteredLogs($filterContents)
+    public function filterData()
     {
-        if (isset($_GET['name'])) {
-            $filterBtnName = $_GET['name'];
-            $filterID = explode('-', $filterBtnName);
+        $filterKeys = array('filter0', 'filter1', 'filter2', 'filter3');
+        $filterColumns = array('ticketPrice', 'flightDurationMinutes', 'airlineName', 'aircraftType');
 
-            $categoryIndex = $filterID[0];
-            $optionIndex = $filterID[1];
-            $selectedFilter = $filterContents[$categoryIndex][$optionIndex];
+        $conditions = array();
 
-            switch ($categoryIndex) {
-                case 0:
-                    if ($optionIndex == 0) {
-                        $this->condition = "WHERE CONVERT(REPLACE(ticketPrice, '$', ''), SIGNED) < 100";
-                    } elseif ($optionIndex == 1) {
-                        $this->condition = "WHERE CONVERT(REPLACE(ticketPrice, '$', ''), SIGNED) BETWEEN 100 AND 300";
-                    } elseif ($optionIndex == 2) {
-                        $this->condition = "WHERE CONVERT(REPLACE(ticketPrice, '$', ''), SIGNED) BETWEEN 301 AND 700";
-                    } elseif ($optionIndex == 3) {
-                        $this->condition = "WHERE CONVERT(REPLACE(ticketPrice, '$', ''), SIGNED) > 700";
+        for ($i = 0; $i < count($filterKeys); $i++) {
+            $filterKey = $filterKeys[$i];
+            $columnName = $filterColumns[$i];
+
+            if (isset($_GET[$filterKey]) && $_GET[$filterKey] != '') {
+                $value = $_GET[$filterKey];
+
+                if ($filterKey == 'filter0') {
+                    $value = str_replace('$', '', $value);
+
+                    if ($value == 'Less than 100.00') {
+                        $conditions[] = "CONVERT(REPLACE($columnName, '$', ''), SIGNED) < 100";
+                    } elseif ($value == '100.00-300.00') {
+                        $conditions[] = "CONVERT(REPLACE($columnName, '$', ''), SIGNED) BETWEEN 100 AND 300";
+                    } elseif ($value == '301.00-700.00') {
+                        $conditions[] = "CONVERT(REPLACE($columnName, '$', ''), SIGNED) BETWEEN 301 AND 700";
+                    } elseif ($value == 'More than 700.00') {
+                        $conditions[] = "CONVERT(REPLACE($columnName, '$', ''), SIGNED) > 700";
                     }
-                    break;
-                case 1:
-                    if ($optionIndex == 0) {
-                        $this->condition = "WHERE flightDurationMinutes < 60";
-                    } elseif ($optionIndex == 1) {
-                        $this->condition = "WHERE flightDurationMinutes BETWEEN 60 AND 120";
-                    } elseif ($optionIndex == 2) {
-                        $this->condition = "WHERE flightDurationMinutes BETWEEN 121 AND 300";
-                    } elseif ($optionIndex == 3) {
-                        $this->condition = "WHERE flightDurationMinutes > 300";
+                } elseif ($filterKey == 'filter1') {
+                    if ($value == 'Less than 60 min') {
+                        $conditions[] = "$columnName < 60";
+                    } elseif ($value == '60-120 min') {
+                        $conditions[] = "$columnName BETWEEN 60 AND 120";
+                    } elseif ($value == '121-300 min') {
+                        $conditions[] = "$columnName BETWEEN 121 AND 300";
+                    } elseif ($value == 'More than 300 min') {
+                        $conditions[] = "$columnName > 300";
                     }
-                    break;
-                case 2:
-                    if ($selectedFilter == 'Others') {
-                        $excludedAirlines = implode("','", $filterContents[$categoryIndex]);
-                        $this->condition = "WHERE NOT airlineName IN ('$excludedAirlines')";
-                    } else {
-                        $this->condition = "WHERE airlineName = '$selectedFilter'";
-                    }
-                    break;
-                case 3:
-                    $this->condition = "WHERE aircraftType = '$selectedFilter'";
-                    break;
-                default:
-                    $this->condition = "";
-                    break;
+                } elseif ($value == 'Others') {
+                    $conditions[] = "$columnName NOT IN ('Skibox', 'Feedfire', 'Mynte')";
+                } else {
+                    $conditions[] = "$columnName = '$value'";
+                }
             }
+        }
+
+        if (count($conditions) > 0) {
+            $this->condition = "WHERE " . implode(' AND ', $conditions);
+        } else {
+            $this->condition = "";
         }
     }
 }

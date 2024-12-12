@@ -1,54 +1,10 @@
 <?php
 include("assets/php/connect.php");
 include("assets/php/classes.php");
-
-$filters = array(
-    'Ticket price range',
-    'Flight duration',
-    'Airline',
-    'Aircraft'
-);
-
-$filterContents = array(
-    array(
-        'Less than $100.00',
-        '$100.00-$300.00',
-        '$301.00-$700.00',
-        'More than $700.00'
-    ),
-    array(
-        'Less than 60 min',
-        '60-120 min',
-        '121-300 min',
-        'More than 300 min'
-    ),
-    array(
-        'Skibox',
-        'Feedfire',
-        'Mynte',
-        'Others'
-    ),
-    array(
-        'Airbus A320',
-        'Boeing 737',
-        'Embraer E190'
-    )
-);
-
-$tableColumns = array(
-    'Flight no.',
-    'Departure time',
-    'Arrival time',
-    'Flight duration',
-    'Airline',
-    'Aircraft',
-    'No. of passengers',
-    'Ticket price',
-    'Pilot name'
-);
+include("assets/php/arrays.php");
 
 $flightLog = new FlightLog(null);
-$flightLog->loadFilteredLogs($filterContents);
+$flightLog->filterData();
 $flightLogList = $flightLog->getAllLogs();
 
 ?>
@@ -74,76 +30,90 @@ $flightLogList = $flightLog->getAllLogs();
         </div>
     </nav>
     <div class="base">
-        <div class="top">
-            <h1>Flights Log</h1>
-            <div class="filters">
-                <ul class="filters-wrap">
-                    <?php for ($i = 0; $i < count($filters); $i++) { ?>
-                        <li class="filters-item">
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <?php echo $filters[$i]; ?>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <?php for ($j = 0; $j < count($filterContents[$i]); $j++) {
-                                        $separator = '-';
-                                        ?>
-                                        <li>
-                                            <a class="dropdown-item" name="<?php echo $i . $j ?>"
-                                                href="index.php?name=<?php echo $i . $separator . $j ?>">
-                                                <?php
-                                                echo $filterContents[$i][$j];
-                                                ?>
-                                            </a>
-                                        </li>
-                                        <?php
-                                    }
-                                    ; ?>
-                                </ul>
-                            </div>
+        <form method="GET">
+            <div class="top">
+                <h1>Flights Log</h1>
+                <div class="filters">
+                    <ul class="filters-wrap">
+                        <li>
+                            <a href="./">
+                                <button type="button" class="btn btn-secondary btn-sm mt-4">Clear filters</button>
+                            </a>
                         </li>
-                    <?php }
-                    ; ?>
-                </ul>
+                        <?php for ($i = 0; $i < count($filterContents); $i++) { ?>
+                            <li class="filters-item">
+                                <label for="filter<?php echo $i; ?>"><?php echo $filters[$i]; ?></label>
+                                <select onchange="this.form.submit()" name="filter<?php echo $i; ?>"
+                                    id="filter<?php echo $i; ?>" class="form-select form-select-sm select-dropdown"
+                                    aria-label="Default select example">
+                                    <option value="" selected>All</option>
+                                    <?php foreach ($filterContents[$i] as $filterOption) {
+                                        $isSelected = (isset($_GET["filter$i"]) && $_GET["filter$i"] == $filterOption) ? 'selected' : '';
+                                        ?>
+                                        <option value="<?php echo $filterOption; ?>" <?php echo $isSelected; ?>>
+                                            <?php echo $filterOption; ?>
+                                        </option>
+                                    <?php } ?>
+                                </select>
+                            </li>
+                        <?php } ?>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <div class="logs-table" style="overflow-x:auto;">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <?php
-                        $counter = 1;
-                        foreach ($tableColumns as $tableColumn) {
-                            ?>
-                            <th scope="col">
-                                <div class="log-column d-flex">
-                                    <?php echo $tableColumn ?>
-                                    <div class="sort" onclick="changeOrientation('sorter<?php echo $counter ?>')"
-                                        id="sorter<?php echo $counter ?>" name="sorter<?php echo $counter ?>">
-                                        <i class="bi bi-arrow-down-short" style="font-size:28px;font-weight:600"></i>
+            <input type="hidden" name="sortColumn" id="sortColumn"
+                value="<?php echo isset($_GET['sortColumn']) ? $_GET['sortColumn'] : ''; ?>">
+            <input type="hidden" name="sortDirection" id="sortDirection"
+                value="<?php echo isset($_GET['sortDirection']) ? $_GET['sortDirection'] : 'ASC'; ?>">
+            <div class="logs-table m-3" style="overflow-x:auto;">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <?php
+                            $counter = 0;
+                            foreach ($tableColumns as $tableColumn) {
+                                ?>
+                                <th scope="col">
+                                    <div class="log-column d-flex">
+                                        <?php echo $tableColumn; ?>
+                                        <a onclick="changeSort(<?php echo $counter; ?>)">
+                                            <div class="sort ms-2" id="sorter<?php echo $counter ?>"
+                                                name="sorter<?php echo $counter ?>">
+                                                <i class="bi <?php echo ($sortDirection == 'ASC') ? 'bi-arrow-up-short' : 'bi-arrow-down-short'; ?>"
+                                                    style="font-size:28px;font-weight:600;"></i>
+                                            </div>
+                                        </a>
                                     </div>
-                                </div>
-                            </th>
-                            <?php $counter++;
-                        } ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($flightLogList as $flightLogItem) {
-                        echo $flightLogItem->displayLog();
-                    } ?>
-                </tbody>
-            </table>
-        </div>
+                                </th>
+                                <?php $counter++;
+                            } ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (count($flightLogList) > 0) {
+                            foreach ($flightLogList as $flightLogItem) {
+                                echo $flightLogItem->displayLog();
+                            }
+                        } else {
+                            echo '<tr><td colspan="9" class="text-center">No data is found</td></tr>';
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </form>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
     <script>
-        function changeOrientation(btnID){
-            var btnSort = document.getElementById(btnID);
-            btnSort.
+        function changeSort(column) {
+            var currentDirection = document.getElementById('sortDirection').value;
+            var newDirection = currentDirection === 'ASC' ? 'DESC' : 'ASC';
+
+            document.getElementById('sortColumn').value = column;
+            document.getElementById('sortDirection').value = newDirection;
+            document.forms[0].submit();
         }
     </script>
 </body>

@@ -1,14 +1,17 @@
+body {
+    overflow: hidden;
+}
+
 .navbar-brand img {
     height: 45px;
 }
 
-.top{
+.top {
     padding-top: 75px;
     padding-inline: 20px;
-    padding-bottom: 20px;
 }
 
-.filters ul{
+.filters ul {
     list-style: none;
 }
 
@@ -29,29 +32,40 @@
     padding: 5px;
 }
 
-.logs-table{
-    overflow: hidden;
+.logs-table {
+    height: calc(100vh - 210px);
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 15px;
 }
 
 .custom-table {
-    width: calc(100% - 40px);
+    width: 100%;
     border-collapse: collapse;
-    border-spacing: 0;
-    margin-inline: 20px;
-    overflow-x: scroll;
-    overflow-y: hidden;
-    overflow: hidden;
-}
-
-.custom-table th,
-.custom-table td {
-    padding: 6px 15px;
-    text-align: left;
 }
 
 .custom-table thead {
-    background-color: #D9D9D9;
-    border-radius: 25px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #800000;
+    color: white;
+}
+
+.custom-table td {
+    padding: 2px 0px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.custom-table th{
+    padding: 4px 4px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.custom-table td {
+    background-color: white;
 }
 
 .custom-table thead th:first-child {
@@ -64,23 +78,56 @@
     border-bottom-right-radius: 25px;
 }
 
-.custom-table td {
-    border-bottom: 1px solid #ddd;
+.center-text{
+    text-align: center;
 }
 
-.log-column, .sort{
+.log-column,
+.sort {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.sort{
+.sort {
     border-radius: 50%;
     width: 25px;
     height: 25px;
+    color: white;
 }
 
-.sort:hover{
-    background: #c2c0c0;
+.sort:hover {
+    background: white;
     cursor: pointer;
+    color: #800000;
+}
+
+.logs-table::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.logs-table::-webkit-scrollbar-thumb {
+    background-color: #800000;
+    border-radius: 5px;
+    border: 2px solid #f4f4f4;
+}
+
+.logs-table::-webkit-scrollbar-track {
+    border-radius: 5px;
+}
+
+.logs-table {
+    scrollbar-width: thin;
+    scrollbar-color: #800000 white;
+}
+
+div.logs-table::-webkit-scrollbar-button {
+    display: none !important;
+}
+
+@media(max-width:578px) {
+    .logs-table {
+        overflow-x: auto;
+    }
 }
